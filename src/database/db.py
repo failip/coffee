@@ -19,7 +19,7 @@ class Database:
         return
 
     def delete_user(self, user):
-        if self.users.find({"name": user.name}):
+        if self.user_exsists(user):
             self.users.delete_one({"name": user.name})
             return
         print("User does not exsist")
