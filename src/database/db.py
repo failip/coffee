@@ -26,20 +26,33 @@ class Database:
         # self.all_users=
 
     def create_user(self, user):
-        if self.users.find({"name": user.name}):
-            print("User already exsists")
-            return
-        create_id = self.users.insert_one(user.__dict__).inserted_id
-        return create_id
+        if not self.user_exsists(user):
+            create_id = self.users.insert_one(user.__dict__).inserted_id
+            return create_id
+        print("User already exsists")
+        return
 
     def delete_user(self, user):
-        pass
+        if self.users.find({"name": user.name}):
+            self.users.delete_one({"name": user.name})
+            return
+        print("User does not exsist")
+        return
 
     def change_balance(self, user, balance):
         pass
 
     def increase_balance(self, user, amount):
-        pass
+        updated_balance = self.users.find_one_and_update(
+            {"name": user.name}, {"$inc": {"balance": amount}})
+        print("Updated Balance: ")
+        return
 
     def decrease_balance(self, user, amount):
         pass
+
+    def user_exsists(self, user):
+        if list(self.users.find({"name": user.name})):
+            return True
+        else:
+            return False
