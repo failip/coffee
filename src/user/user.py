@@ -1,14 +1,10 @@
-import yaml
-
-with open("prices.yaml", "r") as f:
-    try:
-        prices = yaml.safe_load(f)
-    except yaml.YAMLError as exc:
-        print(exc)
-
-print(prices)
+import json
 
 
-class user:
-    """Userinfo"""
-    pass
+class User:
+    def __init__(self, name, balance) -> None:
+        self.name = name
+        self.balance = balance
+
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
