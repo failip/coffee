@@ -1,0 +1,11 @@
+prices:
+    beer:
+        - 0.6
+    water:
+        - 0.6
+    clubmate:
+        - 1.0
+    coffee_strong:
+        - 0.25
+    coffee_weak:
+        - 0.15
