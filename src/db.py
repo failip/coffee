@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from user import User
 
 
 class Database:
@@ -7,6 +8,13 @@ class Database:
             'localhost', 27017, username="root", password="root")
         self.db = self.client.test_database
         self.users = self.db.users
+
+    def get_user(self, name):
+        data = self.users.find_one({"name": name})
+        if (data):
+            return User(name=data["name"], balance=data["balance"])
+        else:
+            return None
 
     def get_all_users(self):
         pass
@@ -25,9 +33,9 @@ class Database:
         print("User does not exsist")
         return
 
-    def update_balance(self, user, balance):
+    def update_balance(self, user):
         self.users.find_one_and_update(
-            {"name": user.name}, {"$inc": {"balance": balance}})
+            {"name": user.name}, {"$set": {"balance": user.balance}})
 
     def increase_balance(self, user, amount):
         user.balance += amount
