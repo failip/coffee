@@ -2,17 +2,28 @@ import yaml
 
 from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+
+from bson.json_util import dumps
 
 from db import Database
-from user import User
 
 app = FastAPI()
 database = Database()
 
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-class NewUser(BaseModel):
+class User(BaseModel):
     name: str
     balance: float
 
@@ -37,7 +48,7 @@ def read_yaml():
 
 
 @app.put("/users")
-def update_item(new_user: NewUser):
+def update_item(new_user: User):
     database.create_user(new_user)
 
 
@@ -53,3 +64,16 @@ def buy(order: Order):
     price = prices_dict["prices"][order.item][0]
     user = database.get_user(order.user)
     database.decrease_balance(user, price)
+
+@app.get("/user")
+def get_user_by_name(name: str):
+    user = database.users.find_one({"name": name})
+    if user is not None:
+        return JSONResponse(content=dumps(user))
+    raise HTTPException(status_code=404, detail="User not found")
+
+@app.get("/users")
+def get_all_users():
+    users = database.users.find({})
+    if users is not None:
+        return JSONResponse(content=dumps(users))
