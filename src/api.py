@@ -1,6 +1,7 @@
+from lib2to3.pytree import Base
 import yaml
 
-from typing import Optional
+from typing import Optional, List, TypedDict
 
 from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
@@ -23,6 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class User(BaseModel):
     name: str
     balance: float
@@ -36,6 +38,15 @@ class Order(BaseModel):
 class Deposit(BaseModel):
     user: str
     amount: float
+
+
+class Item(BaseModel):
+    name: str
+    price: float
+
+
+class Settings(BaseModel):
+    items: List[Item]
 
 
 def read_yaml():
@@ -65,6 +76,7 @@ def buy(order: Order):
     user = database.get_user(order.user)
     database.decrease_balance(user, price)
 
+
 @app.get("/user")
 def get_user_by_name(name: str):
     user = database.users.find_one({"name": name})
@@ -72,8 +84,27 @@ def get_user_by_name(name: str):
         return JSONResponse(content=dumps(user))
     raise HTTPException(status_code=404, detail="User not found")
 
+
 @app.get("/users")
 def get_all_users():
     users = database.users.find({})
     if users is not None:
         return JSONResponse(content=dumps(users))
+
+
+@app.get("/settings")
+def get_settings():
+    settings = database.get_settings()
+    print(settings)
+    if settings is not None:
+        return JSONResponse(content=dumps(settings))
+
+
+@app.post("/settings")
+def update_settings(settings: Settings):
+    database.update_settings(settings)
+
+
+@app.put("/settings")
+def create_settings(settings: Settings):
+    database.create_settings(settings)

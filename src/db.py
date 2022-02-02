@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from user import User
+import json
 
 
 class Database:
@@ -8,6 +9,7 @@ class Database:
             'localhost', 27017, username="root", password="root")
         self.db = self.client.test_database
         self.users = self.db.users
+        self.settings = self.db.settings
 
     def get_user(self, name):
         data = self.users.find_one({"name": name})
@@ -50,3 +52,18 @@ class Database:
             return True
         else:
             return False
+
+    def get_settings(self):
+        return self.settings.find_one({})
+
+    def update_settings(self, settings):
+        items = {}
+        for item in settings.items:
+            items[item.name] = item.price
+        self.settings.find_one_and_update({}, {"$set": items})
+
+    def create_settings(self, settings):
+        items = {}
+        for item in settings.items:
+            items[item.name] = item.price
+        self.settings.insert_one(items)
