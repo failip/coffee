@@ -5,7 +5,7 @@ from typing import Optional, List, TypedDict
 
 from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from bson.json_util import dumps
@@ -49,15 +49,6 @@ class Settings(BaseModel):
     items: List[Item]
 
 
-def read_yaml():
-    with open("../resources/prices.yaml", "r") as f:
-        try:
-            prices = yaml.safe_load(f)
-            return prices
-        except yaml.YAMLError as exc:
-            print(exc)
-
-
 @app.put("/users")
 def update_item(new_user: User):
     database.create_user(new_user)
@@ -81,7 +72,7 @@ def buy(order: Order):
 def get_user_by_name(name: str):
     user = database.users.find_one({"name": name})
     if user is not None:
-        return JSONResponse(content=dumps(user))
+        return PlainTextResponse(content=dumps(user))
     raise HTTPException(status_code=404, detail="User not found")
 
 
@@ -89,7 +80,7 @@ def get_user_by_name(name: str):
 def get_all_users():
     users = database.users.find({})
     if users is not None:
-        return JSONResponse(content=dumps(users))
+        return PlainTextResponse(content=dumps(users))
 
 
 @app.get("/settings")
@@ -97,7 +88,7 @@ def get_settings():
     settings = database.get_settings()
     print(settings)
     if settings is not None:
-        return JSONResponse(content=dumps(settings))
+        return PlainTextResponse(content=dumps(settings))
 
 
 @app.post("/settings")
