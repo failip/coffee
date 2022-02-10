@@ -107,3 +107,8 @@ def update_settings(settings: Settings):
 @app.put("/settings")
 def create_settings(settings: Settings):
     database.create_settings(settings)
+
+
+@app.delete("/user")
+def delete_user(user: User):
+    database.delete_user(user.name)

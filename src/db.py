@@ -28,12 +28,8 @@ class Database:
         print("User already exsists")
         return
 
-    def delete_user(self, user):
-        if self.user_exsists(user):
-            self.users.delete_one({"name": user.name})
-            return
-        print("User does not exsist")
-        return
+    def delete_user(self, name):
+        self.users.delete_one({"name": name})
 
     def update_balance(self, user):
         self.users.find_one_and_update(
