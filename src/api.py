@@ -71,8 +71,8 @@ def deposit(deposit: Deposit):
 
 @app.post("/buy")
 def buy(order: Order):
-    prices_dict = read_yaml()
-    price = prices_dict["prices"][order.item][0]
+    prices_dict = database.get_settings()
+    price = prices_dict[order.item]
     user = database.get_user(order.user)
     database.decrease_balance(user, price)
 
