@@ -1,3 +1,5 @@
+from curses.ascii import HT
+from email.policy import HTTP
 from lib2to3.pytree import Base
 import yaml
 
@@ -63,9 +65,15 @@ def deposit(deposit: Deposit):
 @app.post("/buy")
 def buy(order: Order):
     prices_dict = database.get_settings()
-    price = prices_dict[order.item]
-    user = database.get_user(order.user)
-    database.decrease_balance(user, price)
+    if order.item in prices_dict and order.item != "_id":
+        price = prices_dict[order.item]
+        user = database.get_user(order.user)
+        if user:
+            database.decrease_balance(user, price)
+        else:
+            raise HTTPException(status_code=404, detail="User does not exist")
+    else:
+        raise HTTPException(status_code=404, detail="Item not buyable")
 
 
 @app.get("/user")
